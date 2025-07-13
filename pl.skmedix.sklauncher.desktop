@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=SKlauncher
+Comment=Minecraft Launcher from SKmedix
+Exec=sklauncher
+Icon=pl.skmedix.sklauncher
+Type=Application
+Categories=Game;
+Terminal=false

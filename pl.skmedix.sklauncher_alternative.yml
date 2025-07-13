@@ -1,0 +1,47 @@
+id: pl.skmedix.sklauncher
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+command: sklauncher
+modules:
+  - name: openjdk
+    buildsystem: simple
+    sources:
+      - type: archive
+        url: https://github.com/adoptium/temurin21-binaries/releases/download/jdk-21.0.7%2B6/OpenJDK21U-jdk_x64_linux_hotspot_21.0.7_6.tar.gz
+        sha256: 974d3acef0b7193f541acb61b76e81670890551366625d4f6ca01b91ac152ce0
+        strip-components: 0
+    build-commands:
+      - mkdir -p /app/jre
+      - mv jdk-21.0.7+6 jre
+      - mv jre /app
+  - name: sklauncher
+    buildsystem: simple
+    sources:
+      - type: file
+        url: https://skmedix.pl/binaries/skl/3.2.12/SKlauncher-3.2.12.jar
+        sha256: a3912e1e9b4e3b2d5362c91176444c7d5b1a15437cb827f123e4ca2b0d12c3f9
+    build-commands:
+      - install -D SKlauncher-3.2.12.jar /app/lib/SKlauncher-3.2.12.jar
+      - |
+        install -Dm755 /dev/stdin /app/bin/sklauncher <<EOF
+        #!/usr/bin/env bash
+        exec java -jar /app/lib/SKlauncher-3.2.12.jar "\$@"
+        EOF
+  - name: desktop-file-and-icon
+    buildsystem: simple
+    sources:
+      - type: file
+        path: pl.skmedix.sklauncher.desktop
+      - type: file
+        path: logo.png
+    build-commands:
+      - install -Dm644 pl.skmedix.sklauncher.desktop /app/share/applications/pl.skmedix.sklauncher.desktop
+      - install -Dm644 logo.png /app/share/icons/hicolor/scalable/apps/pl.skmedix.sklauncher.png
+finish-args:
+  - --share=network
+  - --socket=x11
+  - --socket=pulseaudio
+  - --device=dri
+  - --env=PATH=/app/jre/bin:/app/bin:/usr/bin
+  - --filesystem=home/.minecraft:create
